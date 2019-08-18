@@ -10,7 +10,7 @@ exports.run = (client, message, args, level) => {
     const longest = commandNames.reduce((long, str) => Math.max(long, str.length), 0);
 
     let currentCategory = "";
-    let output = `= Command List =\n[Contact Danskbog if there are any problems.]\n[Use ${settings.prefix}help <commandname> for details]\n`;
+    let output = `= Command List =\n[Contact Westar if there are any problems.]\n[Use ${settings.prefix}help <commandname> for details]\n`;
     const sorted = myCommands.array().sort((p, c) => p.help.category > c.help.category ? 1 :  p.help.name > c.help.name && p.help.category === c.help.category ? 1 : -1 );
     sorted.forEach( c => {
       const cat = c.help.category.toProperCase();
@@ -33,7 +33,7 @@ exports.run = (client, message, args, level) => {
       .addField("**Usage:**", `${settings.prefix}${command.help.usage}`, true)
       .setDescription(`${command.help.description}`)
       .setThumbnail(`${client.user.avatarURL}`)
-      .setFooter("Servant v1.0, custom made by: Danskbog#0001");
+      .setFooter("Servant v1.0, created by Danskbog#0001, maintained by Westar#0001");
       if (command.conf.aliases.length) {
         embed.addField("**Aliases:**", `${command.conf.aliases.join(", ")}`, false)
       } else {
