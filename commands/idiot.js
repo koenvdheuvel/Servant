@@ -5,13 +5,13 @@ exports.run = async (client, message, args, level) => {
     if (talkedRecently.has(message.author.id)) {
               message.channel.send("You have to wait 1 minute before you can use this command again!" + message.author);
       } else {
-    const pika = client.emojis.get("612757827664085002");
+    const pika = '';
     const idiot = message.mentions.members.first() || message.guild.members.get(args[0]) || message.member;
 	
 	if (idiot.id === "221373638979485696") {
 		message.channel.send(`${idiot} is senpai ${pika}`)
 	} else if (idiot.id === "221373638979485696") {
-		message.channel.send(`lmao`)
+		message.channel.send(`westar = poep`)
 	} else {
 		message.channel.send(`${idiot} ur an idiot ${pika}`).then(fgt => {
 		  fgt.react("🖕");
