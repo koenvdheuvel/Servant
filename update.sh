@@ -1,1 +1,1 @@
-git pull && docker-compose up -d
+git pull && docker-compose up --build -d
