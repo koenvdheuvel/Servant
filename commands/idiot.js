@@ -5,7 +5,7 @@ exports.run = async (client, message, args, level) => {
     if (talkedRecently.has(message.author.id)) {
               message.channel.send("You have to wait 1 minute before you can use this command again!" + message.author);
       } else {
-    const pika = "lmao";
+    const pika = client.emojis.get("612757827664085002");
     const idiot = message.mentions.members.first() || message.guild.members.get(args[0]) || message.member;
 	
 	if (idiot.id === "221373638979485696") {
