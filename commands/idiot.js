@@ -10,7 +10,7 @@ exports.run = async (client, message, args, level) => {
 	
 	if (idiot.id === "221373638979485696") {
 		message.channel.send(`${idiot} is senpai ${pika}`)
-	} else if (idiot.id === "221373638979485696") {
+	} else if (idiot.id === "208996860583477249") {
 		message.channel.send(`westar = poep`)
 	} else {
 		message.channel.send(`${idiot} ur an idiot ${pika}`).then(fgt => {
