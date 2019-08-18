@@ -2,7 +2,7 @@ const Discord = require("discord.js");
 const request = require("request");
 
 exports.run = async (client, message, args, level) => {
-  const clientId = 'iv0p2rfrqqqs6e23d12e1mr07a7h7h';
+  const clientId = client.config.twitchToken;
   const gaylink = 'https://api.twitch.tv/helix/streams?user_login=';
 
   const options = {

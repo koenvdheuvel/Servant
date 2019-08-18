@@ -1,9 +1,10 @@
 const config = {
-  "ownerID": "221373638979485696",
+  "ownerID": "",
   "admins": [],
   "support": [],
 
   "token":  "",
+  "twitchToken": "",
 
   "defaultSettings" : {
     "prefix": ";",
