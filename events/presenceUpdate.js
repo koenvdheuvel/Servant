@@ -51,13 +51,13 @@ module.exports = async (client, oldMember, newMember) => {
     const stremerurl = game.url;
     if (!stremerurl) return;
     const stremer = stremerurl.substr(22);
-    const gaylink = stremerurl.replace('https://www.twitch.tv/', 'https://api.twitch.tv/helix/streams?user_login=');
+    const twitchuri = stremerurl.replace('https://www.twitch.tv/', 'https://api.twitch.tv/helix/streams?user_login=');
 
     console.log(stremer);
 
     const options = {
           method: 'GET',
-          url: gaylink,
+          url: twitchuri,
           headers:
           {
               'Client-ID': clientId,
