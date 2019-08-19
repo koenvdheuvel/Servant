@@ -10,7 +10,12 @@ module.exports = async (client, oldMember, newMember) => {
         const liverole = newMember.guild.roles.find('name', settings.liveRole);
 
         if (!verified || !liverole) {
-            console.log(`ERR: role with key 'verified' or 'liverole' was not found`);
+            if (!verified) {
+                console.log(`ERR: role with key 'verified' was not found`);
+            }
+            if (!liverole) {
+                console.log(`ERR: role with key 'liverole' was not found`);
+            }
             return;
         }
         if(newMember.roles.has(verified.id)) {
