@@ -11,7 +11,7 @@ export default class ActionLogRepository {
 			userId: userId,
 			action: actionType,
 			channelId: channelId,
-			data: JSON.stringify(data),
+			data: data ? Buffer.from(JSON.stringify(data)).toString('base64') : '',
 		}]);
 	}
 
