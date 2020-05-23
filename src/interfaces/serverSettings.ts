@@ -12,4 +12,7 @@ export default interface ServerSettings {
 
 	streamLiveRole: string|null;
 	streamShout: string|null;
+
+	adminRole: string|null;
+	moderatorRole: string|null;
 }

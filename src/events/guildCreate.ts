@@ -13,6 +13,8 @@ export default async function GuildCreateEvent(discordClient: DiscordClient, gui
 		systemNotice: true,
 		streamLiveRole: null,
 		streamShout: null,
+		adminRole: null, 
+		moderatorRole: null,
 	});
 	Logger.info(`Created guild ${guild.id}`);
 }

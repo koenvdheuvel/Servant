@@ -4,7 +4,7 @@ if (parseInt(process.version.slice(1).split(".")[0], 10) < 12) {
 
 import { Client as DiscordClient } from "discord.js";
 import Config from "./lib/config";
-import BindRoutes from "./routes";
+import { BindRoutes } from "./routes";
 
 const discord = new DiscordClient();
 BindRoutes(discord);

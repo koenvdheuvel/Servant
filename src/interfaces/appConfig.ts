@@ -1,4 +1,5 @@
 export default interface ApplicationConfig {
+	botOwnerUserId: string;
 	database: DatabaseConfig;
 	discord: DiscordConfig;
 }

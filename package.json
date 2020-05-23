@@ -20,6 +20,7 @@
 		"fs-extra": "^9.0.0",
 		"mysql": "^2.18.1",
 		"request": "^2.88.0",
+		"string-argv": "^0.3.1",
 		"typescript": "^3.9.3",
 		"util": "^0.10.3"
 	}
