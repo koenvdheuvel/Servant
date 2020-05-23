@@ -13,6 +13,7 @@ import PurgeCommand from "./commands/purge";
 import StatsCommand from "./commands/stats";
 import ConfigCommand from "./commands/config";
 import LiveResetCommand from "./commands/resetlive";
+import PresenceUpdateEvent from "./events/presenceUpdate";
 
 const Commands: ICommand[] = [
 	PurgeCommand,
@@ -31,6 +32,7 @@ const EventBind = {
 	'guildDelete': GuildDeleteEvent,
 	'voiceStateUpdate': VoiceStateUpdateEvent,
 	'messageDeleteBulk': MessageDeleteBulkEvent,
+	'presenceUpdate': PresenceUpdateEvent,
 };
 
 export async function BindRoutes(discordClient: DiscordClient) {
