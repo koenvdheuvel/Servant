@@ -16,10 +16,11 @@
 		"@types/fs-extra": "^9.0.1",
 		"@types/mysql": "^2.15.11",
 		"@types/node": "^14.0.5",
+		"@types/request": "^2.48.5",
 		"discord.js": "^12.2.0",
 		"fs-extra": "^9.0.0",
 		"mysql": "^2.18.1",
-		"request": "^2.88.0",
+		"request": "^2.88.2",
 		"string-argv": "^0.3.1",
 		"typescript": "^3.9.3",
 		"util": "^0.10.3"

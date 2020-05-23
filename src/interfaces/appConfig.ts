@@ -1,7 +1,12 @@
 export default interface ApplicationConfig {
 	botOwnerUserId: string;
+	twitch: TwitchConfig;
 	database: DatabaseConfig;
 	discord: DiscordConfig;
+}
+
+export interface TwitchConfig {
+	clientId: string;
 }
 
 export interface DatabaseConfig {

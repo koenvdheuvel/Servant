@@ -50,39 +50,5 @@ export default async function MessageEvent(discordClient: DiscordClient, message
 		// no permission
 		return;
 	}
-	cmd.run(discordClient, message, args);
-
-	//const guildId = message?.guild?.id;
-	//const serverSettings = await ServerSettingsRepository.GetByGuildId(guildId);
-	//if (serverSettings === null) {
-	//	Logger.error(`Couldnt get server settings for ${guildId}`);
-	//	return;
-	//}
-
-	//if (!serverSettings.logChannel || oldMessage.content === newMessage.content) {
-	//	return;
-	//}
-
-	//// add action to database
-	//await ActionLogRepository.Add(serverSettings.id, oldMessage.author.id, ActionType.MessageEdit, oldMessage.channel.id, {
-	//	from: oldMessage.content,
-	//	to: newMessage.content,
-	//});
-
-	//const channel = getTextChannel(discordClient, serverSettings.logChannel);
-	//if (channel === null) {
-	//	Logger.error(`Couldnt get log channel for server ${oldMessage?.guild?.id}`);
-	//	return;
-	//}
-
-	//const embed = new MessageEmbed()
-	//	.setColor(0xFFA500)
-	//	.setTimestamp()
-	//	.setAuthor("Message Edited")
-	//	.addField("User", `${newMessage.author.tag}`, true)
-	//	.addField("Channel", `${oldMessage.channel}`, true)
-	//	.addField("Before", `${oldMessage.content}`, false)
-	//	.addField("After", `${newMessage.content}`, false)
-	//	.setFooter(`User ID: ${newMessage.author.id}`);
-	//channel.send({embed});
+	await cmd.run(discordClient, message, args);
 }
