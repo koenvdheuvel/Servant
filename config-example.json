@@ -1,0 +1,17 @@
+{
+	"botOwnerUserId": "",
+	"twitch": {
+		"clientId": ""
+	},
+	"database": {
+		"host": "",
+		"user": "",
+		"password": "",
+		"database": ""
+	},
+	"discord": {
+		"clientId": "",
+		"clientSecret": "",
+		"botToken": ""
+	}
+}
