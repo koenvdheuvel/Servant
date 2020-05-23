@@ -11,10 +11,14 @@ import MessageEvent from "./events/message";
 import { ICommand } from "./commands/base";
 import PurgeCommand from "./commands/purge";
 import StatsCommand from "./commands/stats";
+import ConfigCommand from "./commands/config";
+import LiveResetCommand from "./commands/resetlive";
 
 const Commands: ICommand[] = [
 	PurgeCommand,
 	StatsCommand,
+	ConfigCommand,
+	LiveResetCommand,
 ].map(x => new x());
 
 const EventBind = {

@@ -20,9 +20,14 @@ export default class ServerSettingsRepository {
 		const database = Database.getInstance()
 
 		try {
-			await database.query("INSERT INTO ServerSettings SET ?", [ serverSettings ]);
+			if (serverSettings.id == 0) {
+				await database.query("INSERT INTO ServerSettings SET ?", [ serverSettings ]);
+			} else {
+				await database.query("UPDATE ServerSettings SET ? WHERE id = ?", [ serverSettings, serverSettings.id ]);
+			}
 			return true;
 		} catch(e) {
+			console.log(e);
 			return false;
 		}
 	}
