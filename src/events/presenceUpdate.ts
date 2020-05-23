@@ -8,8 +8,8 @@ import * as request from "request";
 const sleep = waitTimeInMs => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
 
 export default async function PresenceUpdateEvent(discordClient: DiscordClient, oldPresence: Presence|null, newPresence: Presence) {
-    const randomColor = "#000000".replace(/0/g, () => (~~(Math.random() * 16)).toString(16));
-	
+	const randomColor = "#000000".replace(/0/g, () => (~~(Math.random() * 16)).toString(16));
+
 	const guildId = newPresence.guild?.id;
 	const serverSettings = await ServerSettingsRepository.GetByGuildId(guildId);
 	if (serverSettings === null) {
@@ -29,30 +29,30 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 	}
 
 	if (serverSettings.streamLiveRole !== null) {
-        const liverole = await guild.roles.fetch(serverSettings.streamLiveRole);
+		const liverole = await guild.roles.fetch(serverSettings.streamLiveRole);
 
-        if (!liverole) {
+		if (!liverole) {
 			Logger.error(`ERR: role with key 'liverole' was not found`);
-            return;
-        }
+			return;
+		}
 		if (guildMember.roles.cache.has(serverSettings.streamLiveRole) && streamingActivity === undefined) {
 			await guildMember.roles.remove(liverole)
 		} else if (streamingActivity !== undefined) {
 			await guildMember.roles.add(liverole)
 		}
-    }
+	}
 
-    if (serverSettings.streamShout !== null) {
-        if (!oldPresence || !newPresence || wasStreaming || !streamingActivity || !streamingActivity.url) {
-            return;
+	if (serverSettings.streamShout !== null) {
+		if (!oldPresence || !newPresence || wasStreaming || !streamingActivity || !streamingActivity.url) {
+			return;
 		}
-		
+
 		const promotionChannel = getTextChannel(discordClient, serverSettings.streamShout);
-        if (!promotionChannel) {
-            Logger.error(`ERR: channel with key 'streamShout' was not found`);
-            return;
+		if (!promotionChannel) {
+			Logger.error(`ERR: channel with key 'streamShout' was not found`);
+			return;
 		}
-		
+
 		const streamUrl = streamingActivity.url;
 		const streamUsername = streamUrl.substr(22);
 		const twitchuri = `https://api.twitch.tv/helix/streams?user_login=${streamUsername}`;
@@ -72,7 +72,7 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 			}
 			const data = JSON.parse(body);
 			console.log("streamerData", data);
-			
+
 			const strem = data.data[0];
 			const thumb = strem.thumbnail_url.replace('{width}x{height}', '384x216');
 
@@ -88,6 +88,6 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 			return;
 		});
 
-    }
+	}
 
 }
