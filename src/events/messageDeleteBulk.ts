@@ -1,6 +1,6 @@
 
 
-import { Client as DiscordClient, Message, MessageEmbed, Collection, Snowflake, ReactionUserManager } from "discord.js";
+import { Client as DiscordClient, Message, Collection, Snowflake } from "discord.js";
 import ActionLogRepository from "../repository/actionLog";
 import ServerSettingsRepository from "../repository/severSettings";
 import Logger from "../lib/log";
@@ -30,18 +30,13 @@ export default async function MessageDeleteBulkEvent(discordClient: DiscordClien
 	}
 
 	const messageArray = messages.array();
-	const embed = new MessageEmbed();
 	let output: string[] = [];
 	messageArray.forEach( c => {
 		output.push(`[${c.createdAt.toJSON()}] ${c.author.tag}: ${c.content}`);
-		embed.addField(c.author.tag, c.content);
 	});
 
 	// add action to database
 	await ActionLogRepository.Add(serverSettings.id, null, ActionType.MessagePurge, firstMessage.channel.id, output);
 
-	embed.setColor(0xFF0000)
-		.setAuthor("Messages Purged")
-		.setTimestamp();
-	logchannel.send({embed});
+	logchannel.send("--- MESSAGE PURGE\n" + output.join('\n'), {code: "asciidoc", split: { char: "\u200b" }});
 }
