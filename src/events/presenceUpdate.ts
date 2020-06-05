@@ -3,11 +3,10 @@ import ServerSettingsRepository from "../repository/severSettings";
 import Logger from "../lib/log";
 import { getTextChannel } from "../lib/util";
 import config from "../lib/config";
-import * as request from "request";
+import fetchRetry from "../lib/fetchRetry";
+import fetch from "node-fetch";
 
-const sleep = waitTimeInMs => new Promise(resolve => setTimeout(resolve, waitTimeInMs));
-
-export default async function PresenceUpdateEvent(discordClient: DiscordClient, oldPresence: Presence|null, newPresence: Presence) {
+export default async function PresenceUpdateEvent(discordClient: DiscordClient, oldPresence: Presence | null, newPresence: Presence) {
 	const randomColor = "#000000".replace(/0/g, () => (~~(Math.random() * 16)).toString(16));
 
 	const guildId = newPresence.guild?.id;
@@ -32,7 +31,7 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 		const liverole = await guild.roles.fetch(serverSettings.streamLiveRole);
 
 		if (!liverole) {
-			Logger.error(`ERR: role with key 'liverole' was not found`);
+			Logger.error(`Role with key 'liverole' was not found`);
 			return;
 		}
 		if (guildMember.roles.cache.has(serverSettings.streamLiveRole) && streamingActivity === undefined) {
@@ -49,45 +48,76 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 
 		const promotionChannel = getTextChannel(discordClient, serverSettings.streamShout);
 		if (!promotionChannel) {
-			Logger.error(`ERR: channel with key 'streamShout' was not found`);
+			Logger.error(`Channel with key 'streamShout' was not found`);
+			return;
+		}
+
+		const authUrl = `https://id.twitch.tv/oauth2/token?client_id=${config.twitch.clientId}&client_secret=${config.twitch.clientSecret}&grant_type=client_credentials`;
+		const authResponse = await fetch(authUrl, {
+			method: 'post',
+		});
+
+		const authJson = await authResponse.json();
+		if (authResponse.status !== 200) {
+			Logger.error(`Couldn't fetch authentication token`);
 			return;
 		}
 
 		const streamUrl = streamingActivity.url;
 		const streamUsername = streamUrl.substr(22);
-		const twitchuri = `https://api.twitch.tv/helix/streams?user_login=${streamUsername}`;
+		const twitchUri = `https://api.twitch.tv/helix/streams?user_login=${streamUsername}`;
+		const userAgent = "Servant"
 
-		await sleep(2 * 60 * 1000);
-		// TODO:
-		// Remove request dependency
-		request({
-			method: 'GET',
-			url: twitchuri,
-			headers: {
-				'Client-ID': config.twitch.clientId,
-			}
-		}, function (error, res, body) {
-			if (error || !body) {
+		try {
+			const statusResponse = await fetchRetry(twitchUri, {
+				retries: 10,
+				retryDelay: 30000,
+				retryOn: async function (attempt, error, response) {
+					const clone = response?.clone()
+					if (!clone) {
+						Logger.error(`No response, attempt ${attempt + 1}`);
+						return true;
+					}
+	
+					const responseData = await clone.json()
+					if (responseData.data.length == 0) {
+						Logger.error(`Streamer is offline, attempt ${attempt + 1}`);
+						return true;
+					}
+	
+					return false;
+				},
+				method: 'get',
+				headers: {
+					'Client-ID': config.twitch.clientId,
+					'User-Agent': userAgent,
+					'Authorization': 'Bearer ' + authJson.access_token
+				}
+			})
+	
+			const statusJson = await statusResponse.json();
+			if (statusJson.data.length == 0) {
+				Logger.error(`Streamer appears to be offline`);
 				return;
 			}
-			const data = JSON.parse(body);
-			console.log("streamerData", data);
-
-			const strem = data.data[0];
-			const thumb = strem.thumbnail_url.replace('{width}x{height}', '384x216');
-
+	
+			const stream = statusJson.data[0];
+			const thumbnail = stream.thumbnail_url.replace('{width}x{height}', '384x216');
+	
 			const embed = new MessageEmbed()
 				.setColor(randomColor)
-				.setImage(thumb)
-				.setAuthor(`${guildMember.user.tag}`, `${guildMember.user.avatarURL}`)
-				.setDescription(`**Streamer:** ${strem.user_name}`)
-				.addField("**Stream Title:**", `${strem.title}`, false)
+				.setImage(thumbnail)
+				.setAuthor(`${guildMember.displayName}`, `${guildMember.user.displayAvatarURL()}`)
+				.setDescription(`**Streamer:** ${stream.user_name}`)
+				.addField("**Stream Title:**", `${stream.title}`, false)
 				.addField("**Stream URL:**", `${streamUrl}`, false);
-
-			promotionChannel.send({embed});
+				
+			promotionChannel.send({ embed });
+			
+		} catch(e) {
+			Logger.error(`PresenceUpdate Caught Error`, e);
 			return;
-		});
-
+		}
 	}
 
 }
