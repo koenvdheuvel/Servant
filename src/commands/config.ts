@@ -1,7 +1,8 @@
 import { ICommand, PermissionLevel } from "./base";
 import { Message, Client, MessageEmbed } from "discord.js";
 import ServerSettingsRepository from "../repository/severSettings";
-import { Server } from "http";
+import WhiteListedGamesRepository from "../repository/whiteListedGames";
+import TwitchClient from "../lib/twitch";
 
 export default class ConfigCommand implements ICommand {
 
@@ -10,13 +11,14 @@ export default class ConfigCommand implements ICommand {
 	permissionLevel = PermissionLevel.Administrator;
 	guildOnly = false;
 
-	usageText = ";config [set] [key] [value]";
+	usageText = ";config [set/add/remove] [key] [value]";
 	helpText = "Shows bot stats";
 
 	async run(discordClient: Client, message: Message, args: string[]) {
 		const guildId = message.guild?.id;
 		const ss = await ServerSettingsRepository.GetByGuildId(guildId);
-		if (!ss || !message.guild) {
+		const wlg = await WhiteListedGamesRepository.GetByGuildId(guildId);
+		if (!ss || !wlg || !message.guild) {
 			return;
 		}
 
@@ -54,6 +56,11 @@ export default class ConfigCommand implements ICommand {
 				modRoleString = `${modRole?.name || 'ERR-404'} (${ss.moderatorRole})`;
 			}
 
+			let whiteListedGamesString = 'Off';
+			if (wlg.length > 0) {
+				whiteListedGamesString = wlg.map(g => g.name).join("\n");
+			}
+
 			const embed = new MessageEmbed()
 				.setColor(0x33CC33)
 				.setTimestamp()
@@ -64,12 +71,9 @@ export default class ConfigCommand implements ICommand {
 				.addField("streamShout", streamShoutString)
 				.addField("adminRole", adminRoleString)
 				.addField("moderatorRole", modRoleString)
+				.addField("whiteListedGames", whiteListedGamesString)
 				.setFooter(`ServerID: ${ss.id}`);
 			message.reply({embed});
-			return;
-		}
-
-		if (args.length != 3) {
 			return;
 		}
 
@@ -136,14 +140,54 @@ export default class ConfigCommand implements ICommand {
 					ss.moderatorRole = modRole.id;
 				}
 			}
+		}
 
-			if (await ServerSettingsRepository.Save(ss)) {
-				message.reply('Done');
-			} else {
-				message.reply('Unkown error');
+		if (args.length > 3 && args[0] == 'add') {
+			const key = args[1];
+			const value = args.slice(2).join(" ");
+
+			if (key == 'whiteListedGames') {
+				if (value == 'null') {
+					message.reply('No game specified');
+					return;
+				} else {
+					const twitch = TwitchClient.getInstance()
+					const game = await twitch.getGameData(value);
+					if (!game) { 
+						message.reply('Game does not exist for Twitch');
+						return;
+					}
+					
+					WhiteListedGamesRepository.Add(guildId, game.id, game.name);
+				}
 			}
 		}
 
-	}
+		if (args.length > 3 && args[0] == 'remove') {
+			const key = args[1];
+			const value = args.slice(2).join(" ");
 
+			if (key == 'whiteListedGames') {
+				if (value == 'null') {
+					message.reply('No game specified');
+					return;
+				} else {
+					if (wlg.find(g => g.name == value)) {
+						WhiteListedGamesRepository.Remove(guildId, value);
+					} else { 
+						message.reply('Game is not in whitelist');
+						return;
+					}
+				}
+			}
+		}
+
+		if (await ServerSettingsRepository.Save(ss)) {
+			message.reply('Done');
+		} else {
+			message.reply('Unkown error');
+		}
+			
+	}
+	
 }
