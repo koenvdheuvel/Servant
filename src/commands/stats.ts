@@ -65,7 +65,7 @@ export default class StatsCommand implements ICommand {
 		const embed = createMessageEmbed({
 			color: 0x33CC33,
 			author: "Bot statistics",
-			footer: `Servant developed by Westar, originally by Danskbog`,
+			footer: `Servant developed by Westar and Notfood, originally by Danskbog`,
 			fields: [
 				{
 					key: "Build",
