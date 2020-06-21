@@ -1,6 +1,7 @@
 import { Client as DiscordClient, Presence } from "discord.js";
 import ServerSettingsRepository from "../repository/severSettings";
 import WhiteListedGamesRepository from "../repository/whiteListedGames";
+import StreamBuffer from "../repository/streamBuffer";
 import Logger from "../lib/log";
 import TwitchClient from "../lib/twitch";
 import { getTextChannel } from "../lib/util";
@@ -26,6 +27,21 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 	}
 
 	const whiteListed = await CheckGameWhitelisted(streamingActivity);
+	
+	if ((serverSettings.streamLiveRole !== null || serverSettings.streamShout !== null) && whiteListed && serverSettings.streamTimeout > 0) {
+		const sb = StreamBuffer.getInstance()
+		let timeout = sb.get(guildMember.user.id)
+
+		if (streamingActivity !== undefined) {
+			if (timeout !== null && timeout < new Date()) {
+				return;
+			} else {
+				timeout = new Date()
+				timeout.setTime(timeout.getTime() + (serverSettings.streamTimeout*3600000))
+				sb.set(guildMember.user.id, timeout)
+			}
+		}
+	}
 
 	if (serverSettings.streamLiveRole !== null) {
 		const liverole = await guild.roles.fetch(serverSettings.streamLiveRole);
