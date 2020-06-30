@@ -1,6 +1,6 @@
-import { Client as DiscordClient, Presence } from "discord.js";
+import { Client as DiscordClient, Presence, GuildMember } from "discord.js";
 import ServerSettingsRepository from "../repository/severSettings";
-import WhiteListedGamesRepository from "../repository/whiteListedGames";
+import WhiteListRepository from "../repository/whiteList";
 import StreamTimeoutRepository from "../repository/streamTimeout";
 import Logger from "../lib/log";
 import TwitchClient from "../lib/twitch";
@@ -26,7 +26,7 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 		return;
 	}
 
-	const whiteListed = await CheckGameWhitelisted(streamingActivity);
+	const whiteListed = await CheckIfWhitelisted(streamingActivity, guildMember);
 	
 	if ((serverSettings.streamLiveRole !== null || serverSettings.streamShout !== null) && whiteListed && serverSettings.streamTimeout > 0) {
 		const str = StreamTimeoutRepository.getInstance()
@@ -102,7 +102,7 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 			
 	}
 
-	async function CheckGameWhitelisted(streamingActivity: any): Promise<boolean> {
+	async function CheckIfWhitelisted(streamingActivity: any, member: GuildMember): Promise<boolean> {
 		if (streamingActivity === undefined || !streamingActivity.url) { 
 			return false;
 		}
@@ -116,16 +116,15 @@ export default async function PresenceUpdateEvent(discordClient: DiscordClient, 
 			return false;
 		}
 
-		const wlg = await WhiteListedGamesRepository.GetByGuildId(guildId);
-		if (!wlg) {
+		const wl = await WhiteListRepository.GetByGuildId(guildId);
+		if (!wl) {
 			return true;
 		}
 
-		if (wlg.length > 0 && wlg.find(g => g.id === stream.game_id) === undefined) {
-			return false;
-		}	
+		const gameWhiteListed = wl.roles.length === 0 || wl.games.find(g => g.id === stream.game_id) === undefined;
+		const roleWhiteListed = wl.roles.length === 0 || wl.roles.find(r1 => member.roles.cache.find(r2 => r1.id === r2.id) !== undefined) === undefined;
 
-		return true;
+		return gameWhiteListed && roleWhiteListed;
 	}
 
 }
