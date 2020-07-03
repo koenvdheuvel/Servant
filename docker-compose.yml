@@ -1,8 +1,15 @@
 version: '3.5'
 
 services:
+  npm:
+    build: ./
+    working_dir: /opt/project/
+    command: npm install
+    volumes: 
+       - .:/opt/project/
   bot:
     build: ./
+    command: npm start
     environment:
       - DEBUG=*
   mysql:

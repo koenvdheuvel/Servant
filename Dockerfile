@@ -12,5 +12,3 @@ RUN npm install
 # Bundle app source
 COPY . /usr/src/app
 RUN npm run build-ts
-
-CMD [ "npm", "start" ]

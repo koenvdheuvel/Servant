@@ -6,8 +6,8 @@
 	"scripts": {
 		"start": "npm run serve",
 		"serve": "node dist/index.js",
-		"build-ts": "tsc",
-		"test": "npm run build-ts && npm start"
+		"test": "mocha 'test/**'",
+		"build-ts": "tsc"
 	},
 	"engines": {
 		"node": ">=12"
@@ -15,6 +15,7 @@
 	"dependencies": {
 		"@types/fs-extra": "^9.0.1",
 		"@types/isomorphic-fetch": "0.0.35",
+		"@types/mocha": "^7.0.2",
 		"@types/mysql": "^2.15.11",
 		"@types/node": "^14.0.5",
 		"@types/node-fetch": "^2.5.7",
@@ -24,8 +25,13 @@
 		"mysql": "^2.18.1",
 		"node-fetch": "^2.6.0",
 		"request": "^2.88.2",
+		"rewire": "^5.0.0",
 		"string-argv": "^0.3.1",
 		"typescript": "^3.9.3",
 		"util": "^0.10.3"
+	},
+	"devDependencies": {
+		"mocha": "^8.0.1",
+		"sinon": "^9.0.2"
 	}
 }
