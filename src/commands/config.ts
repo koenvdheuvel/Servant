@@ -12,8 +12,8 @@ export default class ConfigCommand implements ICommand {
 	permissionLevel = PermissionLevel.Administrator;
 	guildOnly = false;
 
-	usageText = ";config [set/add/remove] [key] [value]";
-	helpText = "Shows bot stats";
+	usageText = ";config [(set|add|remove) <key> <value>]";
+	helpText = "Shows bot config";
 
 	async run(discordClient: Client, message: Message, args: string[]) {
 		const guildId = message.guild?.id;
