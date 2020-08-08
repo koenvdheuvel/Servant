@@ -4,6 +4,7 @@ import ServerSettingsRepository from "../repository/serverSettings";
 import WhiteListRepository from "../repository/whiteList";
 import TwitchClient from "../lib/twitch";
 import createMessageEmbed from "../wrapper/discord/messageEmbed";
+import Logger from "../lib/log";
 
 export default class ConfigCommand implements ICommand {
 
@@ -71,6 +72,22 @@ export default class ConfigCommand implements ICommand {
 			if (wl.roles.length > 0) {
 				whiteListedRolesString = wl.roles.map(r => guild.roles.resolve(r.id)?.name + " (" + r.id + ")").join("\n");
 			}
+			
+			let quoteThresholdString = 'Off';
+			if (ss.quoteThreshold > 0) {
+				quoteThresholdString = ss.quoteThreshold + ' reactions';
+			}
+			
+			let quoteEmojiString = 'Off';
+			if (ss.quoteEmoji) {
+				quoteEmojiString = `${Buffer.from(ss.quoteEmoji, 'base64')}`;
+			}
+
+			let quoteChannelString = 'Off';
+			if (ss.quoteChannel) {
+				const quoteChannel = guild.channels.resolve(ss.quoteChannel)
+				quoteChannelString = `${quoteChannel?.name || 'ERR-404'} (${ss.quoteChannel})`;
+			}
 
 			const embed = createMessageEmbed({
 				color: 0x33CC33,
@@ -112,6 +129,18 @@ export default class ConfigCommand implements ICommand {
 					{
 						key: "whiteListedRoles",
 						value: whiteListedRolesString,
+					},
+					{
+						key: "quoteThreshold",
+						value: quoteThresholdString,
+					},
+					{
+						key: "quoteEmoji",
+						value: quoteEmojiString,
+					},
+					{
+						key: "quoteChannel",
+						value: quoteChannelString,
 					},
 				],
 			});
@@ -192,6 +221,34 @@ export default class ConfigCommand implements ICommand {
 						return;
 					}
 					ss.moderatorRole = modRole.id;
+				}
+			} else if (key == 'quoteThreshold') {
+				if (value == 'null') {
+					ss.quoteThreshold = 10;
+				} else {
+					const threshold = Number(value)
+					if (isNaN(threshold)) { 
+						message.reply('Couldnt parse threshold');
+						return;
+					}
+					ss.quoteThreshold = threshold;
+				}
+			} else if (key == 'quoteEmoji') {
+				if (value == 'null') {
+					ss.quoteChannel = null;
+				} else {
+					ss.quoteEmoji = Buffer.from(value).toString('base64');
+				}
+			} else if (key == 'quoteChannel') {
+				if (value == 'null') {
+					ss.quoteChannel = null;
+				} else {
+					const quoteChannel = guild.channels.cache.find(x => x.id == value || x.name == value);
+					if (!quoteChannel) {
+						message.reply('Couldnt find channel');
+						return;
+					}
+					ss.quoteChannel = quoteChannel.id;
 				}
 			}
 		}

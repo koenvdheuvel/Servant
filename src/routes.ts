@@ -1,11 +1,13 @@
 import ReadyEvent from "./events/ready";
 import { Client as DiscordClient } from "discord.js";
-import MessageDeleteEvent from "./events/messageDelete";
 import MessageUpdateEvent from "./events/messageUpdate";
+import MessageDeleteEvent from "./events/messageDelete";
+import MessageDeleteBulkEvent from "./events/messageDeleteBulk";
+import MessageReactionAddEvent from "./events/messageReactionAdd";
 import GuildCreateEvent from "./events/guildCreate";
 import GuildDeleteEvent from "./events/guildDelete";
 import VoiceStateUpdateEvent from "./events/voiceStateUpdate";
-import MessageDeleteBulkEvent from "./events/messageDeleteBulk";
+import PresenceUpdateEvent from "./events/presenceUpdate";
 import ErrorEvent from "./events/error";
 import MessageEvent from "./events/message";
 import { ICommand, PermissionLevel } from "./commands/base";
@@ -14,7 +16,6 @@ import PurgeCommand from "./commands/purge";
 import StatsCommand from "./commands/stats";
 import ConfigCommand from "./commands/config";
 import LiveResetCommand from "./commands/resetlive";
-import PresenceUpdateEvent from "./events/presenceUpdate";
 
 const Commands: ICommand[] = [
 	HelpCommand,
@@ -28,13 +29,14 @@ const EventBind = {
 	'ready': ReadyEvent,
 	'message': MessageEvent,
 	'error': ErrorEvent,
-	'messageDelete': MessageDeleteEvent,
 	'messageUpdate': MessageUpdateEvent,
+	'messageDelete': MessageDeleteEvent,
+	'messageDeleteBulk': MessageDeleteBulkEvent,
+	'messageReactionAdd': MessageReactionAddEvent,
 	'guildCreate': GuildCreateEvent,
 	'guildDelete': GuildDeleteEvent,
 	'voiceStateUpdate': VoiceStateUpdateEvent,
-	'messageDeleteBulk': MessageDeleteBulkEvent,
-	'presenceUpdate': PresenceUpdateEvent,
+	'presenceUpdate': PresenceUpdateEvent
 };
 
 export async function BindRoutes(discordClient: DiscordClient) {

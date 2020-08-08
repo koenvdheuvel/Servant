@@ -16,4 +16,8 @@ export default interface ServerSettings {
 
 	adminRole: string|null;
 	moderatorRole: string|null;
+	
+	quoteThreshold: number;
+	quoteEmoji: string|null;
+	quoteChannel: string|null;
 }
