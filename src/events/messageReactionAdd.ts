@@ -26,7 +26,7 @@ export default async function MessageReactionAddEvent(discordClient: DiscordClie
 	
 	const embed = createMessageEmbed({
 		color: 0xFFA500,
-		author: `${ Buffer.from(serverSettings.quoteEmoji, 'base64')} Quote`,
+		author: `${Buffer.from(serverSettings.quoteEmoji, 'base64')} Quote`,
 		fields: [
 			{
 				key: "User",
