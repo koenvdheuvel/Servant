@@ -15,6 +15,7 @@ import StatsCommand from "./commands/stats";
 import ConfigCommand from "./commands/config";
 import LiveResetCommand from "./commands/resetlive";
 import PresenceUpdateEvent from "./events/presenceUpdate";
+import LockdownCommand from "./commands/lockdown";
 
 const Commands: ICommand[] = [
 	HelpCommand,
@@ -22,6 +23,7 @@ const Commands: ICommand[] = [
 	StatsCommand,
 	ConfigCommand,
 	LiveResetCommand,
+	LockdownCommand,
 ].map(x => new x());
 
 const EventBind = {
