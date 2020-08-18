@@ -4,6 +4,7 @@ import ServerSettingsRepository from "../repository/serverSettings";
 import WhiteListRepository from "../repository/whiteList";
 import TwitchClient from "../lib/twitch";
 import createMessageEmbed from "../wrapper/discord/messageEmbed";
+import { SetMutedPermissions, SetMutedPermissionsForChannel } from "../lib/mutedRole";
 
 export default class ConfigCommand implements ICommand {
 
@@ -62,6 +63,18 @@ export default class ConfigCommand implements ICommand {
 				modRoleString = `${modRole?.name || 'ERR-404'} (${ss.moderatorRole})`;
 			}
 
+			let muteRoleString = 'Off';
+			if (ss.muteRole) {
+				const muteRole = guild.roles.resolve(ss.muteRole)
+				muteRoleString = `${muteRole?.name || 'ERR-404'} (${ss.muteRole})`;
+			}
+			
+			let muteChannelString = 'Off';
+			if (ss.muteChannel) {
+				const muteChannel = guild.channels.resolve(ss.muteChannel);
+				muteChannelString = `${muteChannel?.name || 'ERR-404'} (${ss.muteChannel})`;
+			}
+
 			let whiteListedGamesString = 'Off';
 			if (wl.games.length > 0) {
 				whiteListedGamesString = wl.games.map(g => g.name).join("\n");
@@ -104,6 +117,14 @@ export default class ConfigCommand implements ICommand {
 					{
 						key: "moderatorRole",
 						value: modRoleString,
+					},
+					{
+						key: "muteRole",
+						value: muteRoleString,
+					},
+					{
+						key: "muteChannel",
+						value: muteChannelString,
 					},
 					{
 						key: "whiteListedGames",
@@ -181,7 +202,6 @@ export default class ConfigCommand implements ICommand {
 					}
 					ss.adminRole = adminRole.id;
 				}
-				
 			} else if (key == 'moderatorRole') {
 				if (value == 'null') {
 					ss.moderatorRole = null;
@@ -192,6 +212,52 @@ export default class ConfigCommand implements ICommand {
 						return;
 					}
 					ss.moderatorRole = modRole.id;
+				}
+			} else if (key == 'muteRole') {
+				if (value == 'null') {
+					ss.muteRole = null;
+				} else {
+					const muteRole = guild.roles.cache.find(x => x.id == value || x.name == value);
+					if (!muteRole) {
+						message.reply('Couldnt find role');
+						return;
+					}
+					ss.muteRole = muteRole.id;
+				}
+			} else if (key == 'muteChannel') {
+				if (value == 'null') {
+					const oldMutedChannelId = ss.muteChannel;
+					ss.muteChannel = null;
+					
+					if (ss.muteRole && oldMutedChannelId) {
+						const muteChannel = guild.channels.cache.find(x => x.id == oldMutedChannelId);
+						if (!muteChannel) {
+							return;
+						}
+
+						const muteRole = await message.guild?.roles.fetch(ss.muteRole);
+						if (!muteRole) {
+							return;
+						}
+						
+						SetMutedPermissionsForChannel(muteRole, muteChannel, null)
+					}
+				} else {
+					const muteChannel = guild.channels.cache.find(x => x.id == value || x.name == value);
+					if (!muteChannel) {
+						message.reply('Couldnt find channel');
+						return;
+					}
+					ss.muteChannel = muteChannel.id;
+
+					if (ss.muteRole) {
+						const muteRole = await message.guild?.roles.fetch(ss.muteRole!);
+						if (!muteRole) {
+							return;
+						}
+
+						SetMutedPermissionsForChannel(muteRole, muteChannel, muteChannel.id)
+					}
 				}
 			}
 		}

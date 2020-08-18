@@ -4,6 +4,7 @@ import MessageDeleteEvent from "./events/messageDelete";
 import MessageUpdateEvent from "./events/messageUpdate";
 import GuildCreateEvent from "./events/guildCreate";
 import GuildDeleteEvent from "./events/guildDelete";
+import ChannelCreateEvent from "./events/channelCreate";
 import VoiceStateUpdateEvent from "./events/voiceStateUpdate";
 import MessageDeleteBulkEvent from "./events/messageDeleteBulk";
 import ErrorEvent from "./events/error";
@@ -15,6 +16,8 @@ import StatsCommand from "./commands/stats";
 import ConfigCommand from "./commands/config";
 import LiveResetCommand from "./commands/resetlive";
 import PresenceUpdateEvent from "./events/presenceUpdate";
+import MuteCommand from "./commands/mute";
+import UnmuteCommand from "./commands/unmute";
 
 const Commands: ICommand[] = [
 	HelpCommand,
@@ -22,6 +25,8 @@ const Commands: ICommand[] = [
 	StatsCommand,
 	ConfigCommand,
 	LiveResetCommand,
+	MuteCommand,
+	UnmuteCommand
 ].map(x => new x());
 
 const EventBind = {
@@ -32,6 +37,7 @@ const EventBind = {
 	'messageUpdate': MessageUpdateEvent,
 	'guildCreate': GuildCreateEvent,
 	'guildDelete': GuildDeleteEvent,
+	'channelCreate': ChannelCreateEvent,
 	'voiceStateUpdate': VoiceStateUpdateEvent,
 	'messageDeleteBulk': MessageDeleteBulkEvent,
 	'presenceUpdate': PresenceUpdateEvent,

@@ -16,4 +16,7 @@ export default interface ServerSettings {
 
 	adminRole: string|null;
 	moderatorRole: string|null;
+	
+	muteRole: string|null;
+	muteChannel: string|null;
 }
