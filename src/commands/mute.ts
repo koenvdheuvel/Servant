@@ -5,6 +5,7 @@ import ServerSettingsRepository from "../repository/serverSettings";
 import createMessageEmbed from "../wrapper/discord/messageEmbed";
 import MutedRepository from "../repository/muted";
 import { UnmuteWhenExpires } from "../lib/mutedRole";
+import ObjectResolver from "../lib/objectResolver";
 
 export default class MuteCommand implements ICommand {
 
@@ -17,20 +18,22 @@ export default class MuteCommand implements ICommand {
 	helpText = "Mutes user";
 	
 	async run(discordClient: Client, message: Message, args: string[]) {
-		const guildId = message.guild?.id;
+		const guild = message.guild;
+		const guildId = guild?.id;
 		const serverSettings = await ServerSettingsRepository.GetByGuildId(guildId);
-		if (serverSettings === null || serverSettings.muteRole === null) {
+		if (guild == null || guildId == null || serverSettings === null || serverSettings.muteRole === null) {
 			message.reply("Muting has not been configured");
 			return;
 		}
 
-		if (args.length < 3 || message.mentions.members === null || message.mentions.members.size === 0) {
+		if (args.length < 3) {
 			message.reply(this.usageText);
 			return;
 		}
 
-		const guildMember = message.mentions.members.first()
-		if (!guildMember || !args[0].includes(guildMember.id)) {
+		const objectResolver = new ObjectResolver(discordClient);
+		const guildMember = await objectResolver.ResolveGuildMember(guild, args[0]);
+		if (!guildMember) {
 			message.reply(this.usageText)
 			return;
 		}
@@ -47,7 +50,7 @@ export default class MuteCommand implements ICommand {
 			fields: [
 				{
 					key: "User",
-					value: `${args[0]}`,
+					value: `${guildMember.user.tag}`,
 					inline: true,
 				},
 				{
