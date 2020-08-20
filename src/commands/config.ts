@@ -84,10 +84,10 @@ export default class ConfigCommand implements ICommand {
 
 			let whiteListedRolesString = 'Off';
 			if (wl.roles.length > 0) {
-				whiteListedRolesString = wl.roles.map(async r => {
+				whiteListedRolesString = (await Promise.all(wl.roles.map(async r => {
 					const role = await objectResolver.ResolveGuildRole(guild, r.id);
 					return role?.name + " (" + r.id + ")";
-				}).join("\n");
+				}))).join("\n");
 			}
 
 			const embed = createMessageEmbed({
