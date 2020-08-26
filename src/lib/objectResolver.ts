@@ -51,13 +51,30 @@ export default class ObjectResolver {
 			}
 		}
 
-		const result = guild.members.cache.filter(x => {
+		const usernameMatch = guild.members.cache.filter(x => {
 			return x.user.username == query
 		});
-		const resultKey = result.firstKey();
-		if (resultKey) {
-			return result.get(resultKey) ?? null;
+		if (usernameMatch.keys.length > 1) {
+			return null;
 		}
+		const usernameMatchKey = usernameMatch.firstKey();
+		if (usernameMatchKey) {
+			// More than one user matches, unconfident result
+			return usernameMatch.get(usernameMatchKey) ?? null;
+		}
+
+		const lowernameMatch = guild.members.cache.filter(x => {
+			return x.user.username.toLowerCase() == query.toLowerCase()
+		});
+		if (lowernameMatch.keys.length > 1) {
+			// More than one user matches, unconfident result
+			return null;
+		}
+		const lowernameMatchKey = lowernameMatch.firstKey();
+		if (lowernameMatchKey) {
+			return lowernameMatch.get(lowernameMatchKey) ?? null;
+		}
+
 		return null;
 	}
 
