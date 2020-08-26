@@ -78,14 +78,6 @@ async function LiveRole(discordClient: DiscordClient, serverSettings: ServerSett
 
 async function StreamShout(discordClient: DiscordClient, serverSettings: ServerSettings, oldPresence: Presence | null, newPresence: Presence, wasStreaming: boolean, whiteListed: boolean, streamingActivity: Activity|undefined) {
 	if (!oldPresence || !newPresence?.member || wasStreaming || !streamingActivity?.url || !whiteListed || !serverSettings?.streamShout) {
-		Logger.error(`Could not do streamshout`, {
-			oldPresence: !!oldPresence,
-			newPresence: !!newPresence?.member,
-			wasStreaming,
-			streamingActivityUrl: streamingActivity?.url,
-			whiteListed: whiteListed,
-			streamShout: !!serverSettings?.streamShout,
-		});
 		return;
 	}
 
