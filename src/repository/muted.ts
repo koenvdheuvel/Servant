@@ -15,7 +15,7 @@ export default class MutedRepository {
 			byUserId: byUserId,
 			start: date,
 			until: until,
-			reason: reason,
+			reason: reason ? Buffer.from(reason).toString('base64') : '',
 		};
 
 		await database.query("INSERT INTO Muted SET ?", [mute]);
