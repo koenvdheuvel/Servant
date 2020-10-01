@@ -5,6 +5,7 @@ import WhiteListRepository from "../repository/whiteList";
 import TwitchClient from "../lib/twitch";
 import createMessageEmbed from "../wrapper/discord/messageEmbed";
 import { SetMutedPermissions, SetMutedPermissionsForChannel } from "../lib/mutedRole";
+import ObjectResolver from "../lib/objectResolver";
 
 export default class ConfigCommand implements ICommand {
 
@@ -20,6 +21,7 @@ export default class ConfigCommand implements ICommand {
 		const guildId = message.guild?.id;
 		const ss = await ServerSettingsRepository.GetByGuildId(guildId);
 		const wl = await WhiteListRepository.GetByGuildId(guildId);
+		const objectResolver = new ObjectResolver(discordClient);
 		if (!ss || !wl || !message.guild) {
 			return;
 		}
@@ -30,19 +32,19 @@ export default class ConfigCommand implements ICommand {
 
 			let logChannelString = 'Off';
 			if (ss.logChannel) {
-				const logChannel = guild.channels.resolve(ss.logChannel);
+				const logChannel = await objectResolver.ResolveGuildChannel(guild, ss.logChannel);
 				logChannelString = `${logChannel?.name || 'ERR-404'} (${ss.logChannel})`;
 			}
 
 			let streamLiveRoleString = 'Off';
 			if (ss.streamLiveRole) {
-				const liveRole = guild.roles.resolve(ss.streamLiveRole)
+				const liveRole = await objectResolver.ResolveGuildRole(guild, ss.streamLiveRole);
 				streamLiveRoleString = `${liveRole?.name || 'ERR-404'} (${ss.streamLiveRole})`;
 			}
 
 			let streamShoutString = 'Off';
 			if (ss.streamShout) {
-				const shoutChannel = guild.channels.resolve(ss.streamShout)
+				const shoutChannel = await objectResolver.ResolveGuildChannel(guild, ss.streamShout)
 				streamShoutString = `${shoutChannel?.name || 'ERR-404'} (${ss.streamShout})`;
 			}
 
@@ -53,25 +55,25 @@ export default class ConfigCommand implements ICommand {
 
 			let adminRoleString = 'Off';
 			if (ss.adminRole) {
-				const adminRole = guild.roles.resolve(ss.adminRole)
+				const adminRole = await objectResolver.ResolveGuildRole(guild, ss.adminRole);
 				adminRoleString = `${adminRole?.name || 'ERR-404'} (${ss.adminRole})`;
 			}
 
 			let modRoleString = 'Off';
 			if (ss.moderatorRole) {
-				const modRole = guild.roles.resolve(ss.moderatorRole)
+				const modRole = await objectResolver.ResolveGuildRole(guild, ss.moderatorRole);
 				modRoleString = `${modRole?.name || 'ERR-404'} (${ss.moderatorRole})`;
 			}
 
 			let muteRoleString = 'Off';
 			if (ss.muteRole) {
-				const muteRole = guild.roles.resolve(ss.muteRole)
+				const muteRole = await objectResolver.ResolveGuildRole(guild, ss.muteRole);
 				muteRoleString = `${muteRole?.name || 'ERR-404'} (${ss.muteRole})`;
 			}
 			
 			let muteChannelString = 'Off';
 			if (ss.muteChannel) {
-				const muteChannel = guild.channels.resolve(ss.muteChannel);
+				const muteChannel = await objectResolver.ResolveGuildChannel(guild, ss.muteChannel);
 				muteChannelString = `${muteChannel?.name || 'ERR-404'} (${ss.muteChannel})`;
 			}
 
@@ -82,7 +84,10 @@ export default class ConfigCommand implements ICommand {
 
 			let whiteListedRolesString = 'Off';
 			if (wl.roles.length > 0) {
-				whiteListedRolesString = wl.roles.map(r => guild.roles.resolve(r.id)?.name + " (" + r.id + ")").join("\n");
+				whiteListedRolesString = (await Promise.all(wl.roles.map(async r => {
+					const role = await objectResolver.ResolveGuildRole(guild, r.id);
+					return role?.name + " (" + r.id + ")";
+				}))).join("\n");
 			}
 
 			const embed = createMessageEmbed({
@@ -149,7 +154,7 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					ss.logChannel = null;
 				} else {
-					const logChannel = guild.channels.cache.find(x => x.id == value || x.name == value);
+					const logChannel = await objectResolver.ResolveGuildChannel(guild, value);
 					if (!logChannel) {
 						message.reply('Couldnt find channel');
 						return;
@@ -162,7 +167,7 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					ss.streamLiveRole = null;
 				} else {
-					const liveRole = guild.roles.cache.find(x => x.id == value || x.name == value);
+					const liveRole = await objectResolver.ResolveGuildRole(guild, value);
 					if (!liveRole) {
 						message.reply('Couldnt find role');
 						return;
@@ -173,7 +178,7 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					ss.streamShout = null;
 				} else {
-					const promotionChannel = guild.channels.cache.find(x => x.id == value || x.name == value);
+					const promotionChannel = await objectResolver.ResolveGuildChannel(guild, value);
 					if (!promotionChannel) {
 						message.reply('Couldnt find channel');
 						return;
@@ -195,7 +200,7 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					ss.adminRole = null;
 				} else {
-					const adminRole = guild.roles.cache.find(x => x.id == value || x.name == value);
+					const adminRole = await objectResolver.ResolveGuildRole(guild, value);
 					if (!adminRole) {
 						message.reply('Couldnt find role');
 						return;
@@ -206,7 +211,7 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					ss.moderatorRole = null;
 				} else {
-					const modRole = guild.roles.cache.find(x => x.id == value || x.name == value);
+					const modRole = await objectResolver.ResolveGuildRole(guild, value);
 					if (!modRole) {
 						message.reply('Couldnt find role');
 						return;
@@ -217,7 +222,7 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					ss.muteRole = null;
 				} else {
-					const muteRole = guild.roles.cache.find(x => x.id == value || x.name == value);
+					const muteRole = await objectResolver.ResolveGuildRole(guild, value);
 					if (!muteRole) {
 						message.reply('Couldnt find role');
 						return;
@@ -230,12 +235,12 @@ export default class ConfigCommand implements ICommand {
 					ss.muteChannel = null;
 					
 					if (ss.muteRole && oldMutedChannelId) {
-						const muteChannel = guild.channels.cache.find(x => x.id == oldMutedChannelId);
+						const muteChannel = await objectResolver.ResolveGuildChannel(guild, oldMutedChannelId);
 						if (!muteChannel) {
 							return;
 						}
 
-						const muteRole = await message.guild?.roles.fetch(ss.muteRole);
+						const muteRole = await objectResolver.ResolveGuildRole(guild, ss.muteRole);
 						if (!muteRole) {
 							return;
 						}
@@ -243,7 +248,7 @@ export default class ConfigCommand implements ICommand {
 						SetMutedPermissionsForChannel(muteRole, muteChannel, null)
 					}
 				} else {
-					const muteChannel = guild.channels.cache.find(x => x.id == value || x.name == value);
+					const muteChannel = await objectResolver.ResolveGuildChannel(guild, value);
 					if (!muteChannel) {
 						message.reply('Couldnt find channel');
 						return;
@@ -251,7 +256,7 @@ export default class ConfigCommand implements ICommand {
 					ss.muteChannel = muteChannel.id;
 
 					if (ss.muteRole) {
-						const muteRole = await message.guild?.roles.fetch(ss.muteRole!);
+						const muteRole = await objectResolver.ResolveGuildRole(guild, ss.muteRole);
 						if (!muteRole) {
 							return;
 						}
@@ -279,8 +284,8 @@ export default class ConfigCommand implements ICommand {
 				}
 				WhiteListRepository.AddGame(guildId, game.id, game.name);
 			} else if (key == 'whiteListedRoles') {
-				const role = guild.roles.cache.find(r => r.id === value || r.name === value)
-				if (role === undefined) { 
+				const role = await objectResolver.ResolveGuildRole(guild, value);
+				if (role == null) {
 					message.reply('Role id does not exist in this guild');
 					return;
 				}
