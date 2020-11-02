@@ -1,10 +1,6 @@
 import { ICommand, PermissionLevel } from "./base";
 import { Message, Client } from "discord.js";
-import { getCommands } from "../routes";
-import ServerSettingsRepository from "../repository/serverSettings";
-import Logger from "../lib/log";
 import createMessageEmbed from "../wrapper/discord/messageEmbed";
-import GetPermissionLevel from "../lib/authorization";
 
 export default class PollCommand implements ICommand {
 
@@ -20,10 +16,11 @@ export default class PollCommand implements ICommand {
 	disagreeEmoji = '772552252782411816';
 
 	async run(discordClient: Client, message: Message, args: string[]) {
+		const pollContent = message.content.substr(2 + this.commandName.length);
 		const embed = createMessageEmbed({
 			color: 0x33CC33,
 			title: 'QuickPoll',
-			description: args.join(' '),
+			description: pollContent,
 			thumbnail: 'https://i.ibb.co/Y08zHnb/Pika.png',
 			footer: 'Reminder: Use *;poll <question>* to create a new poll'
 		});
