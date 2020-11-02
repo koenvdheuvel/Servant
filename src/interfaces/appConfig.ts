@@ -1,4 +1,5 @@
 export default interface ApplicationConfig {
+	errorUrl: string;
 	botOwnerUserId: string;
 	twitch: TwitchConfig;
 	database: DatabaseConfig;
