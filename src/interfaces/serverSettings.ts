@@ -1,13 +1,13 @@
-export default interface ServerSettings {
+export interface ServerSettings {
 	id: number;
 	guildId: string;
 	deleted: Date|null;
-	
+
 	prefix: string;
-	
+
 	logChannel: string|null;
 	modLogChannel: string|null;
-	
+
 	systemNotice: boolean;
 
 	streamLiveRole: string|null;
@@ -16,7 +16,8 @@ export default interface ServerSettings {
 
 	adminRole: string|null;
 	moderatorRole: string|null;
-	
+
 	muteRole: string|null;
 	muteChannel: string|null;
 }
+

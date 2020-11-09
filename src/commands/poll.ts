@@ -1,6 +1,6 @@
-import { ICommand, PermissionLevel } from "./base";
-import { Message, Client } from "discord.js";
-import createMessageEmbed from "../wrapper/discord/messageEmbed";
+import { ICommand, PermissionLevel } from './base';
+import { Message, Client } from 'discord.js';
+import createMessageEmbed from '../wrapper/discord/messageEmbed';
 
 export default class PollCommand implements ICommand {
 
@@ -15,7 +15,7 @@ export default class PollCommand implements ICommand {
 	agreeEmoji = '772552297075048468';
 	disagreeEmoji = '772552252782411816';
 
-	async run(discordClient: Client, message: Message, args: string[]) {
+	async run(discordClient: Client, message: Message): Promise<void> {
 		const pollContent = message.content.substr(2 + this.commandName.length);
 		const embed = createMessageEmbed({
 			color: 0x33CC33,

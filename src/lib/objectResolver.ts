@@ -1,15 +1,15 @@
-import { Client, Guild, GuildMember, GuildChannel, Role, User  } from "discord.js";
+import { Client, Guild, GuildMember, GuildChannel, Role } from 'discord.js';
 
-const userTagRegex = /(.{2,32})\#((?!0{4})[0-9]{4})$/;
+const userTagRegex = /(.{2,32})#((?!0{4})[0-9]{4})$/;
 
 function isNumeric(s: string) {
 	for (let i = 0; i < s.length; i++) {
 		const d = s.charCodeAt(i);
 		if (d < 48 || d > 57) {
-			return false
+			return false;
 		}
 	}
-	return true
+	return true;
 }
 
 export default class ObjectResolver {
@@ -44,7 +44,7 @@ export default class ObjectResolver {
 			const username = regexmatch[1];
 			const discriminator = regexmatch[2];
 			const result = guild.members.cache.find(x => {
-				return x.user.username == username && x.user.discriminator == discriminator
+				return x.user.username == username && x.user.discriminator == discriminator;
 			});
 			if (result) {
 				return result;
@@ -52,7 +52,7 @@ export default class ObjectResolver {
 		}
 
 		const usernameMatch = guild.members.cache.filter(x => {
-			return x.user.username == query
+			return x.user.username == query;
 		});
 		if (usernameMatch.keys.length > 1) {
 			return null;
@@ -64,7 +64,7 @@ export default class ObjectResolver {
 		}
 
 		const lowernameMatch = guild.members.cache.filter(x => {
-			return x.user.username.toLowerCase() == query.toLowerCase()
+			return x.user.username.toLowerCase() == query.toLowerCase();
 		});
 		if (lowernameMatch.keys.length > 1) {
 			// More than one user matches, unconfident result
@@ -79,7 +79,7 @@ export default class ObjectResolver {
 	}
 
 	async GetGuildMember(guild: Guild, id: string): Promise<GuildMember|null> {
-		return guild.members.resolve(id)
+		return guild.members.resolve(id);
 	}
 
 	async ResolveGuildChannel(guild: Guild, query: string): Promise<GuildChannel|null> {
