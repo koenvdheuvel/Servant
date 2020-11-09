@@ -1,12 +1,16 @@
-import { Client as DiscordClient, Message, GuildAuditLogs } from "discord.js";
-import ActionLogRepository from "../repository/actionLog";
-import ServerSettingsRepository from "../repository/serverSettings";
-import Logger from "../lib/log";
-import { ActionType } from "../interfaces/actionTypeEnum";
-import { getTextChannel } from "../lib/util";
-import createMessageEmbed from "../wrapper/discord/messageEmbed";
+import { Client as DiscordClient, Message, User, Channel } from 'discord.js';
+import ActionLogRepository from '../repository/actionLog';
+import ServerSettingsRepository from '../repository/serverSettings';
+import Logger from '../lib/log';
+import { ActionType } from '../interfaces/actionTypeEnum';
+import { getTextChannel } from '../lib/util';
+import createMessageEmbed from '../wrapper/discord/messageEmbed';
 
 const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+interface ExtraChannel {
+	channel: Channel;
+}
 
 /*
  * MessageDeleteEvent
@@ -16,8 +20,7 @@ const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
  * The "Deleted By" field is "Unkown" if we cannot figure out who deleted it
  */
 
-
-export default async function MessageDeleteEvent(discordClient: DiscordClient, message: Message) {
+export default async function MessageDeleteEvent(discordClient: DiscordClient, message: Message): Promise<void> {
 	if (!message.guild) return; // DM message
 
 	const serverSettings = await ServerSettingsRepository.GetByGuildId(message?.guild?.id);
@@ -45,11 +48,14 @@ export default async function MessageDeleteEvent(discordClient: DiscordClient, m
 	//  - match on channel
 	//  - shouldn't be too long ago
 	const auditEntry = auditLogs.entries.find(x => {
-		const target: any = x.target;
-		const extra: any = x.extra;
-		return target.id === message.author.id &&
-			extra.channel.id === message.channel.id &&
-			Date.now() - x.createdTimestamp < 20000
+		if (x.targetType == 'USER' && x.target instanceof User) {
+			const target: User = x.target;
+			const extra: ExtraChannel = <ExtraChannel>x.extra;
+			return target.id === message.author.id &&
+				extra.channel.id === message.channel.id &&
+				Date.now() - x.createdTimestamp < 20000;
+		}
+		return false;
 	});
 
 	// set the deleted by tag IF we found who deleted it
@@ -68,29 +74,29 @@ export default async function MessageDeleteEvent(discordClient: DiscordClient, m
 
 	const embed = createMessageEmbed({
 		color: 0xFF0000,
-		author: "Message Deleted",
+		author: 'Message Deleted',
 		footer: `User ID: ${message.author.id}`,
 		fields: [
 			{
-				key: "User",
+				key: 'User',
 				value: message.author.tag,
 				inline: true,
 			},
 			{
-				key: "Channel",
+				key: 'Channel',
 				value: `${message.channel}`,
 				inline: true,
 			},
 			{
-				key: "Message Deleted",
+				key: 'Message Deleted',
 				value: message.content,
 			},
 			{
-				key: "Deleted by",
+				key: 'Deleted by',
 				value: deletedBy,
 			},
 		],
 	});
-	
+
 	channel.send({embed});
 }

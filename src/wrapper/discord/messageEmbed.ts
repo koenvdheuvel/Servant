@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed } from 'discord.js';
 
 interface Field {
 	key: string;
@@ -23,12 +23,12 @@ interface Embed {
 }
 
 function randomColor() {
-	return "#000000".replace(/0/g, () => (~~(Math.random() * 16)).toString(16));
+	return '#000000'.replace(/0/g, () => (~~(Math.random() * 16)).toString(16));
 }
 
 function safeFieldValue(input: string): string {
 	if (input == null || input == '') {
-		return "**Empty**";
+		return '**Empty**';
 	}
 	return input;
 }
@@ -38,7 +38,7 @@ export default function createMessageEmbed(input: Embed): MessageEmbed {
 	const embed = new MessageEmbed();
 
 	if (input.title != undefined) {
-		embed.setTitle(input.title)
+		embed.setTitle(input.title);
 	}
 
 	if (input.color != undefined) {
@@ -48,7 +48,7 @@ export default function createMessageEmbed(input: Embed): MessageEmbed {
 			embed.setColor(input.color);
 		}
 	}
-	
+
 	if (input.author != undefined) {
 		embed.setAuthor(input.author, input.authorIcon);
 	}

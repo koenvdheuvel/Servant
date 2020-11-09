@@ -1,11 +1,11 @@
-import { ICommand, PermissionLevel } from "./base";
-import { Message, Client } from "discord.js";
-import ServerSettingsRepository from "../repository/serverSettings";
-import WhiteListRepository from "../repository/whiteList";
-import TwitchClient from "../lib/twitch";
-import createMessageEmbed from "../wrapper/discord/messageEmbed";
-import { SetMutedPermissions, SetMutedPermissionsForChannel } from "../lib/mutedRole";
-import ObjectResolver from "../lib/objectResolver";
+import { ICommand, PermissionLevel } from './base';
+import { Message, Client } from 'discord.js';
+import ServerSettingsRepository from '../repository/serverSettings';
+import WhiteListRepository from '../repository/whiteList';
+import TwitchClient from '../lib/twitch';
+import createMessageEmbed from '../wrapper/discord/messageEmbed';
+import { SetMutedPermissionsForChannel } from '../lib/mutedRole';
+import ObjectResolver from '../lib/objectResolver';
 
 export default class ConfigCommand implements ICommand {
 
@@ -14,10 +14,10 @@ export default class ConfigCommand implements ICommand {
 	permissionLevel = PermissionLevel.Administrator;
 	guildOnly = false;
 
-	usageText = ";config [(set|add|remove) <key> <value>]";
-	helpText = "Shows bot config";
+	usageText = ';config [(set|add|remove) <key> <value>]';
+	helpText = 'Shows bot config';
 
-	async run(discordClient: Client, message: Message, args: string[]) {
+	async run(discordClient: Client, message: Message, args: string[]): Promise<void> {
 		const guildId = message.guild?.id;
 		const ss = await ServerSettingsRepository.GetByGuildId(guildId);
 		const wl = await WhiteListRepository.GetByGuildId(guildId);
@@ -44,7 +44,7 @@ export default class ConfigCommand implements ICommand {
 
 			let streamShoutString = 'Off';
 			if (ss.streamShout) {
-				const shoutChannel = await objectResolver.ResolveGuildChannel(guild, ss.streamShout)
+				const shoutChannel = await objectResolver.ResolveGuildChannel(guild, ss.streamShout);
 				streamShoutString = `${shoutChannel?.name || 'ERR-404'} (${ss.streamShout})`;
 			}
 
@@ -70,7 +70,7 @@ export default class ConfigCommand implements ICommand {
 				const muteRole = await objectResolver.ResolveGuildRole(guild, ss.muteRole);
 				muteRoleString = `${muteRole?.name || 'ERR-404'} (${ss.muteRole})`;
 			}
-			
+
 			let muteChannelString = 'Off';
 			if (ss.muteChannel) {
 				const muteChannel = await objectResolver.ResolveGuildChannel(guild, ss.muteChannel);
@@ -79,64 +79,64 @@ export default class ConfigCommand implements ICommand {
 
 			let whiteListedGamesString = 'Off';
 			if (wl.games.length > 0) {
-				whiteListedGamesString = wl.games.map(g => g.name).join("\n");
+				whiteListedGamesString = wl.games.map(g => g.name).join('\n');
 			}
 
 			let whiteListedRolesString = 'Off';
 			if (wl.roles.length > 0) {
 				whiteListedRolesString = (await Promise.all(wl.roles.map(async r => {
 					const role = await objectResolver.ResolveGuildRole(guild, r.id);
-					return role?.name + " (" + r.id + ")";
-				}))).join("\n");
+					return role?.name + ' (' + r.id + ')';
+				}))).join('\n');
 			}
 
 			const embed = createMessageEmbed({
 				color: 0x33CC33,
-				author: "Bot Config",
+				author: 'Bot Config',
 				footer: `ServerID: ${ss.id}`,
 				fields: [
 					{
-						key: "logChannel",
+						key: 'logChannel',
 						value: logChannelString,
 					},
 					{
-						key: "systemNotice",
+						key: 'systemNotice',
 						value: ss.systemNotice ? 'true' : 'false',
 					},
 					{
-						key: "streamLiveRole",
+						key: 'streamLiveRole',
 						value: streamLiveRoleString,
 					},
 					{
-						key: "streamShout",
+						key: 'streamShout',
 						value: streamShoutString,
 					},
 					{
-						key: "streamTimeout",
+						key: 'streamTimeout',
 						value: streamTimeoutString,
 					},
 					{
-						key: "adminRole",
+						key: 'adminRole',
 						value: adminRoleString,
 					},
 					{
-						key: "moderatorRole",
+						key: 'moderatorRole',
 						value: modRoleString,
 					},
 					{
-						key: "muteRole",
+						key: 'muteRole',
 						value: muteRoleString,
 					},
 					{
-						key: "muteChannel",
+						key: 'muteChannel',
 						value: muteChannelString,
 					},
 					{
-						key: "whiteListedGames",
+						key: 'whiteListedGames',
 						value: whiteListedGamesString,
 					},
 					{
-						key: "whiteListedRoles",
+						key: 'whiteListedRoles',
 						value: whiteListedRolesString,
 					},
 				],
@@ -189,8 +189,8 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					ss.streamTimeout = 0;
 				} else {
-					const timeout = Number(value)
-					if (isNaN(timeout)) { 
+					const timeout = Number(value);
+					if (isNaN(timeout)) {
 						message.reply('Couldnt parse timeout');
 						return;
 					}
@@ -233,7 +233,7 @@ export default class ConfigCommand implements ICommand {
 				if (value == 'null') {
 					const oldMutedChannelId = ss.muteChannel;
 					ss.muteChannel = null;
-					
+
 					if (ss.muteRole && oldMutedChannelId) {
 						const muteChannel = await objectResolver.ResolveGuildChannel(guild, oldMutedChannelId);
 						if (!muteChannel) {
@@ -244,8 +244,8 @@ export default class ConfigCommand implements ICommand {
 						if (!muteRole) {
 							return;
 						}
-						
-						SetMutedPermissionsForChannel(muteRole, muteChannel, null)
+
+						SetMutedPermissionsForChannel(muteRole, muteChannel, null);
 					}
 				} else {
 					const muteChannel = await objectResolver.ResolveGuildChannel(guild, value);
@@ -261,7 +261,7 @@ export default class ConfigCommand implements ICommand {
 							return;
 						}
 
-						SetMutedPermissionsForChannel(muteRole, muteChannel, muteChannel.id)
+						SetMutedPermissionsForChannel(muteRole, muteChannel, muteChannel.id);
 					}
 				}
 			}
@@ -269,14 +269,14 @@ export default class ConfigCommand implements ICommand {
 
 		if (args.length >= 3 && args[0] == 'add') {
 			const key = args[1];
-			const value = args.slice(2).join(" ");
-			if (value == 'null') { 
+			const value = args.slice(2).join(' ');
+			if (value == 'null') {
 				message.reply('No value specified');
 				return;
 			}
 
 			if (key == 'whiteListedGames') {
-				const twitch = TwitchClient.getInstance()
+				const twitch = TwitchClient.getInstance();
 				const game = await twitch.getGameData(value);
 				if (!game) {
 					message.reply('Game does not exist for Twitch');
@@ -295,8 +295,8 @@ export default class ConfigCommand implements ICommand {
 
 		if (args.length >= 3 && args[0] == 'remove') {
 			const key = args[1];
-			const value = args.slice(2).join(" ");
-			if (value == 'null') { 
+			const value = args.slice(2).join(' ');
+			if (value == 'null') {
 				message.reply('No value specified');
 				return;
 			}
@@ -304,14 +304,14 @@ export default class ConfigCommand implements ICommand {
 			if (key == 'whiteListedGames') {
 				if (wl.games.find(g => g.name == value)) {
 					WhiteListRepository.RemoveGame(guildId, value);
-				} else { 
+				} else {
 					message.reply('Game is not in whitelist');
 					return;
 				}
 			} else if (key == 'whiteListedRoles') {
 				if (wl.roles.find(r => r.id == value)) {
 					WhiteListRepository.RemoveRole(guildId, value);
-				} else { 
+				} else {
 					message.reply('Role is not in whitelist');
 					return;
 				}
@@ -323,7 +323,8 @@ export default class ConfigCommand implements ICommand {
 		} else {
 			message.reply('Unkown error');
 		}
-			
+
+		return;
 	}
-	
+
 }
