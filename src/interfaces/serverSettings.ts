@@ -7,6 +7,7 @@ export interface ServerSettings {
 
 	logChannel: string|null;
 	modLogChannel: string|null;
+	voiceActivityLogChannel: string|null;
 
 	systemNotice: boolean;
 

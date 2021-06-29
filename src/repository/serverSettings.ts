@@ -10,6 +10,7 @@ export default class ServerSettingsRepository {
 			deleted: null,
 			prefix: ';',
 			logChannel: null,
+			voiceActivityLogChannel: null,
 			modLogChannel: null,
 			systemNotice: true,
 			streamLiveRole: null,

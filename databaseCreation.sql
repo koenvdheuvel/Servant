@@ -20,6 +20,7 @@ CREATE TABLE `ServerSettings` (
   `deleted` datetime DEFAULT NULL,
   `prefix` varchar(2) NOT NULL,
   `logChannel` varchar(255) DEFAULT NULL,
+  `voiceActivityLogChannel` varchar(255) DEFAULT NULL,
   `modLogChannel` varchar(255) DEFAULT NULL,
   `systemNotice` tinyint(1) NOT NULL,
   `streamLiveRole` varchar(255) DEFAULT NULL,
@@ -57,5 +58,15 @@ CREATE TABLE `Muted` (
   `until` datetime NOT NULL,
   `end` datetime DEFAULT NULL,
   `reason` longtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `SquirrelLog`;
+CREATE TABLE `SquirrelLog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `guildId` VARCHAR(255) NOT NULL,
+  `channelId` VARCHAR(255) NOT NULL,
+  `date` datetime NOT NULL,
+  `squirrelHash` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

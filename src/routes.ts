@@ -19,6 +19,7 @@ import PresenceUpdateEvent from './events/presenceUpdate';
 import MuteCommand from './commands/mute';
 import UnmuteCommand from './commands/unmute';
 import PollCommand from './commands/poll';
+import SquirrelCommand from './commands/squirrel';
 
 const Commands: ICommand[] = [
 	HelpCommand,
@@ -28,7 +29,8 @@ const Commands: ICommand[] = [
 	LiveResetCommand,
 	MuteCommand,
 	UnmuteCommand,
-	PollCommand
+	PollCommand,
+	SquirrelCommand
 ].map(x => new x());
 
 const EventBind = {
@@ -56,7 +58,7 @@ export async function BindRoutes(discordClient: DiscordClient): Promise<void> {
 	}
 }
 
-export async function getCommand(commandStr: string): Promise<ICommand|null> {
+export async function getCommand(commandStr: string): Promise<ICommand | null> {
 	for (const command of Commands) {
 		if (command.commandName == commandStr || (command.aliases && command.aliases.includes(commandStr))) {
 			return command;

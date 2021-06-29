@@ -30,6 +30,12 @@ export default class ConfigCommand implements ICommand {
 
 		if (args.length == 0) {
 
+			let voiceActivityLogChannelString = 'Off';
+			if (ss.voiceActivityLogChannel) {
+				const voiceActivityLogChannel = await objectResolver.ResolveGuildChannel(guild, ss.voiceActivityLogChannel);
+				voiceActivityLogChannelString = `${voiceActivityLogChannel?.name || 'ERR-404'} (${ss.voiceActivityLogChannel})`;
+			}
+
 			let logChannelString = 'Off';
 			if (ss.logChannel) {
 				const logChannel = await objectResolver.ResolveGuildChannel(guild, ss.logChannel);
@@ -100,6 +106,10 @@ export default class ConfigCommand implements ICommand {
 						value: logChannelString,
 					},
 					{
+						key: 'voiceActivityLogChannel',
+						value: voiceActivityLogChannelString,
+					},
+					{
 						key: 'systemNotice',
 						value: ss.systemNotice ? 'true' : 'false',
 					},
@@ -160,6 +170,17 @@ export default class ConfigCommand implements ICommand {
 						return;
 					}
 					ss.logChannel = logChannel.id;
+				}
+			} else if (key == 'voiceActivityLogChannel') {
+				if (value == 'null') {
+					ss.voiceActivityLogChannel = null;
+				} else {
+					const voiceActivityLogChannel = await objectResolver.ResolveGuildChannel(guild, value);
+					if (!voiceActivityLogChannel) {
+						message.reply('Couldnt find channel');
+						return;
+					}
+					ss.voiceActivityLogChannel = voiceActivityLogChannel.id;
 				}
 			} else if (key == 'systemNotice') {
 				ss.systemNotice = Boolean(value);
